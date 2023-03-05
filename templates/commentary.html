@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+
+{% block commentary %} 
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <div class="card my-2">
+        <div class="card-header"><h6>RCB vs Mumbai Indians</h6></div>
+        <div class="card-body" style="height: 50em;overflow-y: auto;">
+          <ul class="nav nav-tabs">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Commentary</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" aria-current="page" href="#">Chat</a>
+            </li>
+          </ul>
+          <ul id="summaryList" style="list-style: none;"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js_scripts %} 
+<script>
+
+  var commentary_list = [];
+  var li = document.createElement("li");
+  var summaryList = document.getElementById('summaryList');
+  var constant = 0
+  var overs = 0.1
+  var result = ["dot", "one","two", "three", "four", "six", "out"]
+  var wdbw = ["mid-off", "mid-on","cover", "long-on"]
+  var tpob = ["bouncer", "yorker","inswinger"]
+
+  function fetchSummaries() {
+    var total = overs + constant
+    if(total <= 1.6){
+        if (constant == 0.6){
+            constant = 0
+            overs = overs + 1
+          } 
+          fetch("https://app.studio.arria.com:443/alite_content_generation_webapp/text/x7wJbqk02rA", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJmM3JpS0N6cjFJZ3JoS1cyWVFoaTYxal8iLCJpYXQiOjE2NzgwMTMzNDIsImV4cCI6MTgzNTY5MzM0MiwiaXNzIjoiQUxpdGUiLCJzdWIiOiJTYUlKOUg2LWFkOGEiLCJBTGl0ZS5wZXJtIjpbInByczp4Ong3d0picWswMnJBIl0sIkFMaXRlLnR0IjoidV9hIn0.S2TI6kiUbA1NPscL1Gs2tJCznDrQDBLTVWalU7E-tXE4tyUz2yjs81hDAPUVuDFNNMNTkD3C4utGPCZt5rJ72w'
+          },
+          body: JSON.stringify({
+            "data": [
+                      {
+                          "id": "Primary",
+                          "type": "json",
+                          "jsonData": {
+                              "game_id": "4885",
+                              "date": {
+                                  "year": "2017",
+                                  "month": "11",
+                                  "monthname": "November",
+                                  "day": "09",
+                                  "dayname": "Thursday",
+                                  "season": "2017-2018"
+                              },
+                              "location": {
+                                  "place": "Bengaluru",
+                                  "stadium": "M. Chinnaswamy Stadium"
+                              },
+                              "overtime":"False",
+                              "team": {
+                                  "gamestatus": {
+                                      "home": "Royal challengers Bengaluru",
+                                      "hs": "RCB",
+                                      "visiting": "Mumbai Indians",
+                                      "vs": "CSK",
+                                      "innings": "first",
+                                      "over": overs + constant,
+                                      "homerun": 20,
+                                      "visitingrun": 17,
+                                      "wickets": 0,
+                                      "hometeamrole": "batting"
+                                  },
+                                  "Player1": {
+                                      "id": "Player1",
+                                      "striker":"True",
+                                      "full": "Virat Kohli",
+                                      "fn": "Virat",
+                                      "ln": "Kohli",
+                                      "run": 0
+                                  },
+                                  "Player2": {
+                                      "id": "Player2",
+                                      "striker":"False",
+                                      "full": "Dinesh Karthik",
+                                      "fn": "Dinesh",
+                                      "ln": "Karthik",
+                                      "run": 0
+                                  },
+                                  "bowler": {
+                                      "full": "Shane Warne",
+                                      "fn": "Shane",
+                                      "ln": "Warne",
+                                      "bowlingtype": "leg spinner"
+                                  }
+                              },
+                              "outcome": {
+                                  "result": result[Math.floor(Math.random() * result.length)],
+                                  "wdbw": wdbw[Math.floor(Math.random() * wdbw.length)],
+                                  "tpob": tpob[Math.floor(Math.random() * tpob.length)],
+                              }
+                          }
+                      }
+                    ],
+          "projectArguments": null,
+          "options": null
+          })
+        })
+        .then(response => 
+            response.json().then(data => ({
+            data: data,
+            status: response.status
+          })
+        ).then(res => {
+          const summaries = res.data[0].result;
+          const listItems = '<li>' + summaries + '</li>';
+          summaryList.innerHTML += listItems
+        })
+        );
+        constant = constant + 0.1;
+      }
+    }
+
+  setInterval(fetchSummaries, 8000); // fetch data every 5 seconds
+</script>
+
+{% endblock %}
